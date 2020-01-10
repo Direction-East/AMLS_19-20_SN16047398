@@ -8,6 +8,8 @@ from sklearn.metrics import classification_report,accuracy_score
 
 from A1.A_feature_extraction import *
 from A1.A1_model_training import *
+from B2.B2A1_model_training import *
+
 
 # PATH TO ALL IMAGES AND PARAMETER SETTINGS
 global basedir, A_image_dir, B_image_dir, target_size
@@ -30,12 +32,13 @@ x_train_gender, x_test_gender, y_train_gender, y_test_gender = train_test_split(
 x_train_smile, x_test_smile, y_train_smile, y_test_smile = train_test_split(X, Y_smile,random_state=0)
 
 # task B
-X_cartoon, y_faceshape, y_smile_eyecolour = B_extract_features_labels(basedir, B_images_dir, B_labels_filename)
+all_image, X_cartoon, y_faceshape, y_eyecolour, faceshapeLabels, eyecolourLabels = B_extract_features_labels(basedir, B_images_dir, B_labels_filename)
 # B1
-x_train_faceshape, x_test_faceshape, y_train_faceshape, y_test_faceshape = train_test_split(X_cartoon, y_faceshape,random_state=0)
+x_train_faceshape_svm, x_test_faceshape_svm, y_train_faceshape_svm, y_test_faceshape_svm = train_test_split(X_cartoon, y_faceshape,random_state=0)
+x_train_faceshape, x_test_faceshape, y_train_faceshape, y_test_faceshape = train_test_split(all_image, faceshapeLabels,random_state=0)
 # B2
-x_train_eyecolour, x_test_eyecolour, y_train_eyecolour, y_test_eyecolour = train_test_split(X_cartoon, y_smile_eyecolour, random_state = 0)
-
+x_train_eyecolour_svm, x_test_eyecolour_svm, y_train_eyecolour_svm, y_test_eyecolour_svm = train_test_split(X_cartoon, y_eyecolour, random_state = 0)
+x_train_eyecolour, x_test_eyecolour, y_train_eyecolour, y_test_eyecolour = train_test_split(all_image, eyecolourLabels,random_state=0)
 # # ======================================================================================================================
 # # Task A1
 model_A1 = A1_classifier(x_train_gender, x_test_gender, y_train_gender, y_test_gender)                 # Build model object.
@@ -58,6 +61,8 @@ print(model_A1.accuracy_score)
 #
 # # ======================================================================================================================
 # # Task B1
+# training
+train(num_iteration=300, x_train_eyecolour, y_train_eyecolour, x_test_eyecolour, y_test_eyecolour)
 # model_B1 = B1(args...)
 # acc_B1_train = model_B1.train(args...)
 # acc_B1_test = model_B1.test(args...)
