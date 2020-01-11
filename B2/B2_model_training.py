@@ -25,6 +25,10 @@ def create_convolutional_layer(input, num_input_channels, conv_filter_size, num_
 
     return layer
 
+def create_dropout_layer(layer, rate):
+    layer = tf.nn.dropout(layer, rate)
+    return layer
+
 def create_flatten_layer(layer):
     layer_shape = layer.get_shape()
     num_features = layer_shape[1:4].num_elements()
@@ -54,15 +58,22 @@ num_filters_conv3 = 64
 fc_layer_size = 128
 
 layer_conv1 = create_convolutional_layer(input=x, num_input_channels=num_channels, conv_filter_size=filter_size_conv1, num_filters=num_filters_conv1)
+
+# layer_conv1_dropped = create_dropout_layer(layer_conv1, 0.2)
+
 layer_conv2 = create_convolutional_layer(input=layer_conv1,
                num_input_channels=num_filters_conv1,
                conv_filter_size=filter_size_conv2,
                num_filters=num_filters_conv2)
 
+# layer_conv2_dropped = create_dropout_layer(layer_conv1, 0.5)
+
 layer_conv3= create_convolutional_layer(input=layer_conv2,
                num_input_channels=num_filters_conv2,
                conv_filter_size=filter_size_conv3,
                num_filters=num_filters_conv3)
+
+# layer_conv3_dropped = create_dropout_layer(layer_conv3, 0.5)
 
 layer_flat = create_flatten_layer(layer_conv3)
 
@@ -97,33 +108,51 @@ def show_progress(epoch, feed_dict_train, feed_dict_validate, val_loss):
     print(msg.format(epoch + 1, acc, val_acc, val_loss))
 
 total_iterations = 0
-batch_size = 500
+batch_size = 50
+epoch_size = 10
+
+def determine_nextbatch(iteration, batch_size, x, y):
+    if ((iteration+1)*batch_size > x.shape[0] and (iteration*batch_size < x.shape[0])):
+        x_batch = np.vstack(x[iteration*batch_size:,:,:,:],x[:(iteration+1)*batch_size-x.shape[0],:,:,:])
+        y_batch = np.vstack(y[iteration*batch_size:],y[:(iteration+1)*batch_size-x.shape[0]])
+        return x_batch, y_batch
+    if (iteration*batch_size > x.shape[0]):
+        start = iteration*batch_size%x.shape[0]
+        x_batch = x[start:start+batch_size,:,:,:]
+        y_batch = y[start:start+batch_size]
+        return x_batch, y_batch
+    else:
+        start = iteration*batch_size
+        x_batch = x[start:start+batch_size,:,:,:]
+        y_batch = y[start:start+batch_size]
+        return x_batch, y_batch
 
 saver = tf.train.Saver()
-def train(num_iteration, x_train_eyecolour, y_train_eyecolour, x_test_eyecolour, y_test_eyecolour):
+def B2_train(num_iteration, x_train_eyecolour, y_train_eyecolour, x_test_eyecolour, y_test_eyecolour, model_name):
     global total_iterations
-
+    train_acc = 0
     for i in range(total_iterations,
                    total_iterations + num_iteration):
 
 #         x_batch, y_true_batch, _, cls_batch = data.train.next_batch(batch_size)
 #         x_valid_batch, y_valid_batch, _, valid_cls_batch = data.valid.next_batch(batch_size)
-        x_batch, y_true_batch = x_train_eyecolour[total_iterations*batch_size:total_iterations*batch_size+50,:,:,:], y_train_eyecolour[total_iterations*batch_size:total_iterations*batch_size+50]
-        x_valid_batch, y_valid_batch = x_test_eyecolour[total_iterations*batch_size:total_iterations*batch_size+50,:,:,:], y_test_eyecolour[total_iterations*batch_size:total_iterations*batch_size+50]
-
+        x_batch, y_true_batch= determine_nextbatch(i, batch_size, x_train_eyecolour, y_train_eyecolour)
         feed_dict_tr = {x: x_batch,
                            y_true: y_true_batch}
-        feed_dict_val = {x: x_valid_batch,
-                              y_true: y_valid_batch}
-
         session.run(optimizer, feed_dict=feed_dict_tr)
-
-        if i % int(x_train_eyecolour.shape[0]/batch_size) == 0:
+        # print(i)
+        if ((i%epoch_size) == (epoch_size-1)):
+            x_valid_batch, y_valid_batch = determine_nextbatch(i, batch_size, x_test_eyecolour, y_test_eyecolour)
+            feed_dict_val = {x: x_valid_batch,
+                      y_true: y_valid_batch}
             val_loss = session.run(cost, feed_dict=feed_dict_val)
-            epoch = int(i / int(x_train_eyecolour.shape[0]/batch_size))
+            epoch = int(i//epoch_size)
 
             show_progress(epoch, feed_dict_tr, feed_dict_val, val_loss)
-            saver.save(session, os.path.join(os.getcwd(),'Dataset/eye-colour-model'))
-
+            model_name = os.path.join('Dataset'+model_name)
+            saver.save(session, os.path.join(os.getcwd(),model_name))
+        if (i == total_iterations + num_iteration)
+        train_acc = session.run(accuracy, feed_dict=feed_dict_tr)
 
     total_iterations += num_iteration
+    return train_acc

@@ -16,9 +16,12 @@ class A2_classifier:
         train_images = self.x_train_smile.reshape((self.x_train_smile.shape[0], 68*2))
         train_labels = list(zip(*self.y_train_smile))[0]
         self.svm_classifier.fit(train_images, train_labels)
+        train_score_at_this_stage = self.svm_classifier.score(train_images[-10:,:], train_labels[-10:])
+        return train_score_at_this_stage
         ############ CV needed here###########
     def test(self):
         test_images = self.x_test_smile.reshape((self.x_test_smile.shape[0], 68*2))
         test_labels = list(zip(* self.y_train_smile))[0]
         pred = self.svm_classifier.predict(test_images)
         self.accuracy_score = accuracy_score(test_labels, pred)
+        return accuracy_score

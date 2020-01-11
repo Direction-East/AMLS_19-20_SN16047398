@@ -8,7 +8,7 @@ from sklearn.metrics import classification_report,accuracy_score
 
 from A1.A_feature_extraction import *
 from A1.A1_model_training import *
-from B2.B2A1_model_training import *
+from B2.B2_model_training import *
 
 
 # PATH TO ALL IMAGES AND PARAMETER SETTINGS
@@ -62,7 +62,7 @@ print(model_A1.accuracy_score)
 # # ======================================================================================================================
 # # Task B1
 # training
-train(num_iteration=300, x_train_eyecolour, y_train_eyecolour, x_test_eyecolour, y_test_eyecolour)
+acc_B1_train = B1_train(num_iteration=250, x_train_faceshape, x_train_faceshape, x_train_faceshape, x_train_faceshape, 'face-shape-model')
 # model_B1 = B1(args...)
 # acc_B1_train = model_B1.train(args...)
 # acc_B1_test = model_B1.test(args...)
@@ -72,7 +72,7 @@ train(num_iteration=300, x_train_eyecolour, y_train_eyecolour, x_test_eyecolour,
 # # ======================================================================================================================
 # # Task B2
 # model_B2 = B2(args...)
-# acc_B2_train = model_B2.train(args...)
+acc_B2_train = B2_train(num_iteration=500, x_train_eyecolour, y_train_eyecolour, x_test_eyecolour, y_test_eyecolour, 'eye-colour-model')
 # acc_B2_test = model_B2.test(args...)
 # Clean up memory/GPU etc...
 #
