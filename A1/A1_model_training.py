@@ -21,7 +21,7 @@ class A1_classifier:
         # train svm model
         train_images = self.x_train_gender.reshape((self.x_train_gender.shape[0], 68*2))
         train_labels = list(zip(*self.y_train_gender))[0]
-        self.tuned_tuned_svm_classifier.fit(train_images, train_labels)
+        self.tuned_svm_classifier.fit(train_images, train_labels)
 
         # output the training score at this stage
         train_score_at_this_stage = self.tuned_svm_classifier.score(train_images[-10:,:], train_labels[-10:])

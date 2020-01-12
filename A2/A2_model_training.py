@@ -29,10 +29,10 @@ class A2_classifier:
 
     def test(self):
         test_images = self.x_test_smile.reshape((self.x_test_smile.shape[0], 68*2))
-        test_labels = list(zip(* self.y_train_smile))[0]
+        test_labels = list(zip(* self.y_test_smile))[0]
         pred = self.tuned_svm_classifier.predict(test_images)
         self.accuracy_score = accuracy_score(test_labels, pred)
-        return accuracy_score
+        return self.accuracy_score
 
     def SVM_CV_multiclass(self, training_images, training_labels, test_images, test_labels):
         tuned_parameters = [{'kernel': ['linear'], 'C': [0.001, 0.01, 0.1, 1]}]

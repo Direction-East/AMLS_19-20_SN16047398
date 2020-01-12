@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 import os
 # from B2.B2_model_training import *
@@ -8,6 +8,7 @@ num_labels = 5
 img_size = 500
 num_channels = 3
 session = tf.Session()
+tf.disable_eager_execution()
 x = tf.placeholder(tf.float32, shape = [None, img_size, img_size, num_channels], name='x')
 y_true = tf.placeholder(tf.float32, shape=[None, num_labels], name='y_true')
 y_true_cls = tf.argmax(y_true, dimension=1)
@@ -103,11 +104,11 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 session.run(tf.global_variables_initializer())
 
-def show_progress(epoch, feed_dict_train, feed_dict_validate, val_loss):
+def show_progress(epoch, feed_dict_train, feed_dict_validate, val_loss, num_epoch):
     acc = session.run(accuracy, feed_dict=feed_dict_train)
     val_acc = session.run(accuracy, feed_dict=feed_dict_validate)
-    msg = "Training Epoch {0} --- Training Accuracy: {1:>6.1%}, Validation Accuracy: {2:>6.1%},  Validation Loss: {3:.3f}"
-    print(msg.format(epoch + 1, acc, val_acc, val_loss))
+    msg = "Training Epoch {0}/{4} --- Training Accuracy: {1:>6.1%}, Validation Accuracy: {2:>6.1%},  Validation Loss: {3:.3f}"
+    print(msg.format(epoch + 1, acc, val_acc, val_loss, num_epoch))
 
 total_iterations = 0
 batch_size = 50
@@ -115,8 +116,8 @@ epoch_size = 10
 
 def determine_nextbatch(iteration, batch_size, x, y):
     if ((iteration+1)*batch_size > x.shape[0] and (iteration*batch_size < x.shape[0])):
-        x_batch = np.vstack(x[iteration*batch_size:,:,:,:],x[:(iteration+1)*batch_size-x.shape[0],:,:,:])
-        y_batch = np.vstack(y[iteration*batch_size:],y[:(iteration+1)*batch_size-x.shape[0]])
+        x_batch = np.vstack((x[iteration*batch_size:,:,:,:],x[:(iteration+1)*batch_size-x.shape[0],:,:,:]))
+        y_batch = np.vstack((y[iteration*batch_size:],y[:(iteration+1)*batch_size-x.shape[0]]))
         return x_batch, y_batch
     if (iteration*batch_size > x.shape[0]):
         start = iteration*batch_size%x.shape[0]
@@ -133,6 +134,7 @@ saver = tf.train.Saver()
 def B1_train(num_iteration, x_train_eyecolour, y_train_eyecolour, x_test_eyecolour, y_test_eyecolour, model_name):
     global total_iterations
     train_acc = 0
+    num_epoch = num_iteration//epoch_size
     for i in range(total_iterations,
                    total_iterations + num_iteration):
 
@@ -149,11 +151,12 @@ def B1_train(num_iteration, x_train_eyecolour, y_train_eyecolour, x_test_eyecolo
             val_loss = session.run(cost, feed_dict=feed_dict_val)
             epoch = int(i//epoch_size)
 
-            show_progress(epoch, feed_dict_tr, feed_dict_val, val_loss)
-            model_name = os.path.join('Dataset'+model_name)
-            saver.save(session, os.path.join(os.getcwd(),model_name))
-        if (i == total_iterations + num_iteration)
-        train_acc = session.run(accuracy, feed_dict=feed_dict_tr)
-
+            show_progress(epoch, feed_dict_tr, feed_dict_val, val_loss, num_epoch)
+            # model_name = os.path.join('Dataset'+model_name)
+            saver.save(session, os.path.join('./Dataset/B1_trained_CNN_model',model_name))
+        if (i == (total_iterations + num_iteration-1)):
+            train_acc = session.run(accuracy, feed_dict=feed_dict_tr)
+            train_acc = session.run(accuracy, feed_dict=feed_dict_tr)
+            train_acc = round(train_acc,2)
     total_iterations += num_iteration
     return train_acc
