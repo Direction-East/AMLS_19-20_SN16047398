@@ -94,6 +94,10 @@ def A_extract_features_labels(basedir,images_dir, labels_filename):
                 all_features.append(features)
                 all_gender_labels.append(gender_labels[img_name])
                 all_smile_labels.append(smile_labels[img_name])
+                # show progress
+                if(len(all_gender_labels)%100 == 0):
+                    print("Extracting image features {0}00/{1}".format(len(all_gender_labels)//100,len(ender_labels)))
+
     landmark_features = np.array(all_features)
     all_gender_labels = (np.array(all_gender_labels) + 1)/2 # simply converts the -1 into 0, so male=0 and female=1
     all_smile_labels = (np.array(all_smile_labels) + 1)/2 # not smile -1 to 0, smile stays at 1
@@ -101,6 +105,8 @@ def A_extract_features_labels(basedir,images_dir, labels_filename):
 
 def A_get_tvt_dataset(basedir,images_dir, labels_filename):
     X, y_gender, y_smile = A_extract_features_labels(basedir,images_dir, labels_filename)
+    # converts 0 into (0,1) and 1 into (1,0)
+    # this step is not neccessary
     Y_gender = np.array([y_gender, -(y_gender - 1)]).T
     Y_smile = np.array([y_smile, -(y_smile - 1)]).T
     return X, Y_gender, Y_smile
