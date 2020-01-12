@@ -96,7 +96,7 @@ def A_extract_features_labels(basedir,images_dir, labels_filename):
                 all_smile_labels.append(smile_labels[img_name])
                 # show progress
                 if(len(all_gender_labels)%100 == 0):
-                    print("Extracting image features {0}00/{1}".format(len(all_gender_labels)//100,len(ender_labels)))
+                    print("Extracting image features {0}/{1}".format(len(all_gender_labels),len(gender_labels)))
 
     landmark_features = np.array(all_features)
     all_gender_labels = (np.array(all_gender_labels) + 1)/2 # simply converts the -1 into 0, so male=0 and female=1
