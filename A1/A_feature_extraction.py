@@ -76,6 +76,8 @@ def A_extract_features_labels(basedir,images_dir, labels_filename):
     target_size = None
     labels_file = open(os.path.join(basedir, labels_filename), 'r')
     lines = labels_file.readlines()
+    # lines = [line.rstrip('\n') for line in lines]
+    # print(lines)
     gender_labels = {line.split('\t')[1] : int(line.split('\t')[2]) for line in lines[1:]}
     smile_labels = {line.split('\t')[1] : int(line.split('\t')[3]) for line in lines[1:]}
     if os.path.isdir(images_dir):

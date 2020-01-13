@@ -15,19 +15,28 @@ class A2_classifier:
         self.x_test_smile = x_test_smile
         self.y_train_smile = y_train_smile
         self.y_test_smile = y_test_smile
-
         # Best params for this task (params are different from A1)
-        self.tuned_svm_classifier = SVC(kernel='linear', C = 0.001)
+        self.tuned_svm_classifier = SVC(kernel='rbf', C = 10)
         self.accuracy_score = 0
+        self.train_valid_error = 0
 
     def svm_train(self):
         train_images = self.x_train_smile.reshape((self.x_train_smile.shape[0], 68*2))
         train_labels = list(zip(*self.y_train_smile))[0]
         self.tuned_svm_classifier.fit(train_images, train_labels)
-        train_score_at_this_stage = self.tuned_svm_classifier.score(train_images[-10:,:], train_labels[-10:])
+        train_score_at_this_stage = self.tuned_svm_classifier.score(train_images[-100:,:], train_labels[-100:])
         return train_score_at_this_stage
 
-    def test(self):
+    def test(self, test_features, test_smileLabels):
+        # test the trained model
+        # prepare the data for the classifier prediction
+        test_images = test_features.reshape((test_features.shape[0], 68*2))
+        test_labels = list(zip(* test_smileLabels))[0]
+        pred = self.tuned_svm_classifier.predict(test_images)
+        self.train_valid_error = accuracy_score(test_labels, pred)
+        return self.train_valid_error
+
+    def train_validation(self):
         test_images = self.x_test_smile.reshape((self.x_test_smile.shape[0], 68*2))
         test_labels = list(zip(* self.y_test_smile))[0]
         pred = self.tuned_svm_classifier.predict(test_images)

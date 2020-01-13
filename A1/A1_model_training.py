@@ -16,6 +16,7 @@ class A1_classifier:
         # the parameter here is the best params found by SVM_CV_multiclass() function bwlow
         self.tuned_svm_classifier = SVC(kernel='linear', C = 0.01)
         self.accuracy_score = 0
+        self.train_valid_error = 0
 
     def svm_train(self):
         # train svm model
@@ -24,10 +25,19 @@ class A1_classifier:
         self.tuned_svm_classifier.fit(train_images, train_labels)
 
         # output the training score at this stage
-        train_score_at_this_stage = self.tuned_svm_classifier.score(train_images[-10:,:], train_labels[-10:])
+        train_score_at_this_stage = self.tuned_svm_classifier.score(train_images[-100:,:], train_labels[-100:])
         return train_score_at_this_stage
 
-    def test(self):
+    def test(self, test_features, test_genderLabels):
+        # test the trained model
+        # prepare the data for the classifier prediction
+        test_images = test_features.reshape((test_features.shape[0], 68*2))
+        test_labels = list(zip(* test_genderLabels))[0]
+        pred = self.tuned_svm_classifier.predict(test_images)
+        self.train_valid_error = accuracy_score(test_labels, pred)
+        return self.train_valid_error
+
+    def train_validation(self):
         # test the trained model
         # prepare the data for the classifier prediction
         test_images = self.x_test_gender.reshape((self.x_test_gender.shape[0], 68*2))

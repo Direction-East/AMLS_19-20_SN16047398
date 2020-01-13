@@ -60,23 +60,23 @@ fc_layer_size = 128
 
 layer_conv1 = create_convolutional_layer(input=x, num_input_channels=num_channels, conv_filter_size=filter_size_conv1, num_filters=num_filters_conv1)
 
-layer_conv1_dropped = create_dropout_layer(layer_conv1, 0.2)
+# layer_conv1_dropped = create_dropout_layer(layer_conv1, 0.2)
 
-layer_conv2 = create_convolutional_layer(input=layer_conv1_dropped,
+layer_conv2 = create_convolutional_layer(input=layer_conv1,
                num_input_channels=num_filters_conv1,
                conv_filter_size=filter_size_conv2,
                num_filters=num_filters_conv2)
 
-layer_conv2_dropped = create_dropout_layer(layer_conv2, 0.5)
+# layer_conv2_dropped = create_dropout_layer(layer_conv2, 0.5)
 
-layer_conv3= create_convolutional_layer(input=layer_conv2_dropped,
+layer_conv3= create_convolutional_layer(input=layer_conv2,
                num_input_channels=num_filters_conv2,
                conv_filter_size=filter_size_conv3,
                num_filters=num_filters_conv3)
 
-layer_conv3_dropped = create_dropout_layer(layer_conv3, 0.5)
+# layer_conv3_dropped = create_dropout_layer(layer_conv3, 0.5)
 
-layer_flat = create_flatten_layer(layer_conv3_dropped)
+layer_flat = create_flatten_layer(layer_conv3)
 
 layer_fc1 = create_fc_layer(input=layer_flat,
                      num_inputs=layer_flat.get_shape()[1:4].num_elements(),
