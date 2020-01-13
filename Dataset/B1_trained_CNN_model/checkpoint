@@ -1,2 +1,0 @@
-model_checkpoint_path: "face_shape_model"
-all_model_checkpoint_paths: "face_shape_model"
